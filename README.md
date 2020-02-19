@@ -26,7 +26,39 @@ Setup a container to run in the background. Use a volume to maintain persistent 
 docker run -d -p 8080:8080 -p 50000:50000 -v jenkins_home:/var/jenkins_home jenkins/jenkins:lts
 ```
 
-Now, you'll have a container running the `jenkins/jenkins:lts` image. 
+### Jenkins and NPM
+We want to run NPM builds from Jenkins, so we need to seed our image. We could do this with a compose and Dockerfile, but for now let's add in the requisite build to our container. First, log into the {generated_name} container: 
+
+```sh
+winpty docker exec -it -u root {generated_name} bin/bash
+```
+
+This will drop you in as `root` in the jenkins container we just spun up. We need to update our apt-get cache, install sudo, and then add the node repos and install nodejs.,
+
+```
+root@4162d686f0e1:/#
+root@4162d686f0e1:/# apt-get update
+
+root@4162d686f0e1:/# apt-get install -y sudo
+root@4162d686f0e1:/# apt-get install -y curl
+
+root@4162d686f0e1:/# curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+
+root@4162d686f0e1:/# apt-get install -y nodejs
+```
+
+Now, you'll have a container running the `jenkins/jenkins:lts` image with node and npm installed on top of it.
+
+### Commit a New Image and Rename
+We should commit a new image now that we've modified the `jenkins/jenkins:lts`. We can do that by saying: 
+
+```sh
+# generic
+docker commit {generated_name} newimage/namegoeshere:version
+
+# example
+docker commit {generated_name} testing/jenkins-npm:latest
+```
 
 Let's rename it so the container is easier to find: 
 
@@ -40,9 +72,12 @@ Finally, we should enable `restart always` so that the container has maximum up-
 docker update --restart always my_jenkins
 ```
 
-> You need to have a Deploy Key and an API Access Token in order to setup the webhooks properly with your Jenkins box. Please refer to [Deploy Keys](https://developer.github.com/v3/guides/managing-deploy-keys/#deploy-keys) and [API Tokens](https://jenkins.io/blog/2018/07/02/new-api-token-system/) for more information. 
+### Jenkins Access
 
-> Your API Access Token is used as the **Secret** in your GitHub webook
+You need to have a Deploy Key and an API Access Token in order to setup the webhooks properly with your Jenkins box. Please refer to [Deploy Keys](https://developer.github.com/v3/guides/managing-deploy-keys/#deploy-keys) and [API Tokens](https://jenkins.io/blog/2018/07/02/new-api-token-system/) for more information. 
+
+Your API Access Token is used as the **Secret** in your GitHub webook
+
 
 ### Sonatype/Nexus3
 Sonatype's Nexus3 will be our repository manager for stashing artifacts/npm builds. 
