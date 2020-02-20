@@ -1,4 +1,4 @@
-# Tic-React-Toe
+# Jenkins-React-Tutorial
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app). 
 <br>Learning from [ReactJS Tutorial](https://reactjs.org/tutorial/tutorial.html). 
 
@@ -116,3 +116,36 @@ We'll be using a combination of Jenkins with SCM hook polling and ngrok to fire 
 That notification will be sent from GitHub to Jenkins, where it will trigger a build job, processing step, or anything in our workflow. 
 
 Please refer to the documentation at [Configuring the GitHub Connection with GitHubHook SCM Polling](https://github.com/tylervanover/jenkins-tutorial/wiki/Configuring-the-GitHub-Connection#configuring-the-github-connection-with-githubhook-scm-polling--). 
+
+### Testing
+To test the front-end, we'll be using [Jest](https://jestjs.io/docs/en/getting-started) with npm. 
+
+Whenever we setup our app, we need the following to our `package.json` file: 
+
+```json
+{
+    "scripts": {
+        "test": "jest"
+    }
+}
+```
+
+We'll also need to handle some [additional configurations](https://jestjs.io/docs/en/tutorial-react) to make sure **react**, **jest**, and our system are all playing nice. 
+
+This enables us to use `npm run test` in our build pipeline to execute the tests and get a result:
+
+```
+$ npm run test
+
+> tic-react-toe@0.1.0 test D:\repos\tic-react-toe
+> jest
+
+ PASS  tests/sum.test.js
+  √ sums two numbers (5ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       1 passed, 1 total
+Snapshots:   0 total
+Time:        4.169s
+Ran all test suites.
+```
